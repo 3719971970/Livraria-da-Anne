@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Livraria da Anne</title>
+<style>
+body{font-family:Arial;background:#fff8f0;margin:0;padding:20px;text-align:center}
+h1{color:#b56576}
+input{padding:10px;margin:5px;width:80%;max-width:300px;border:1px solid #ccc;border-radius:8px}
+button{padding:10px 20px;background:#b56576;color:white;border:none;border-radius:8px}
+.card{background:white;padding:15px;margin:10px auto;max-width:320px;border-radius:10px;box-shadow:0 2px 8px #ddd}
+</style>
+</head>
+<body>
+<h1>📚 Livraria da Anne</h1>
+<p>Seja bem-vinda!</p>
+<input id="titulo" placeholder="Nome do livro">
+<br>
+<input id="preco" placeholder="Preço ex: 29,90">
+<br>
+<button onclick="adicionar()">Adicionar livro</button>
+<div id="lista"></div>
+<script>
+let livros = [];
+function adicionar(){
+let t = document.getElementById('titulo').value;
+let p = document.getElementById('preco').value;
+if(!t) return alert('Escreve o nome do livro');
+livros.push({titulo:t, preco:p});
+document.getElementById('titulo').value='';
+document.getElementById('preco').value='';
+mostrar();
+}
+function mostrar(){
+let html='';
+livros.forEach(l=>{
+html += '<div class="card"><b>'+l.titulo+'</b><br>R$ '+l.preco+'</div>';
+});
+document.getElementById('lista').innerHTML = html;
+}
+</script>
+</body>
+                  </html>
