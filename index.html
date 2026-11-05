@@ -3,42 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Livraria da Anne</title>
+<title>Minha Livraria</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{font-family:Arial;background:#fff8f0;margin:0;padding:20px;text-align:center}
-h1{color:#b56576}
-input{padding:10px;margin:5px;width:80%;max-width:300px;border:1px solid #ccc;border-radius:8px}
-button{padding:10px 20px;background:#b56576;color:white;border:none;border-radius:8px}
-.card{background:white;padding:15px;margin:10px auto;max-width:320px;border-radius:10px;box-shadow:0 2px 8px #ddd}
+body{font-family:Arial;background:#fff8f0;padding:20px;max-width:600px;margin:auto}
+h1{text-align:center;color:#5b2c0f}
+input{width:100%;padding:12px;margin:5px 0;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
+button{width:100%;padding:12px;background:#ff6b00;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+.livro{background:white;padding:12px;margin:10px 0;border-radius:8px;display:flex;justify-content:space-between;box-shadow:0 1px 5px #ddd}
+.preco{color:green;font-weight:bold}
+.excluir{background:red;color:white;border:none;padding:5px 10px;border-radius:5px;cursor:pointer;width:auto}
 </style>
 </head>
 <body>
-<h1>📚 Livraria da Anne</h1>
-<p>Seja bem-vinda!</p>
+<h1>📚 Minha Livraria</h1>
 <input id="titulo" placeholder="Nome do livro">
-<br>
-<input id="preco" placeholder="Preço ex: 29,90">
-<br>
-<button onclick="adicionar()">Adicionar livro</button>
+<input id="preco" type="number" placeholder="Preço ex: 29.90">
+<button onclick="salvar()">Salvar Livro</button>
 <div id="lista"></div>
+
 <script>
-let livros = [];
-function adicionar(){
-let t = document.getElementById('titulo').value;
-let p = document.getElementById('preco').value;
-if(!t) return alert('Escreve o nome do livro');
-livros.push({titulo:t, preco:p});
-document.getElementById('titulo').value='';
-document.getElementById('preco').value='';
-mostrar();
+const SUPABASE_URL = "https://oxjemqeekrvhhddcjsjm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NLHoVtP6lDUpfDGaFwElew_3OX8CWc5";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function carregar(){
+  const {data, error} = await supabaseClient.from('livros').select('*').order('created_at',{ascending:false});
+  if(error){alert(error.message); return;}
+  document.getElementById('lista').innerHTML = data.map(l => `
+    <div class="livro">
+      <span>${l.titulo}</span>
+      <span><span class="preco">R$ ${l.preco}</span> <button class="excluir" onclick="excluir(${l.id})">X</button></span>
+    </div>`).join('');
 }
-function mostrar(){
-let html='';
-livros.forEach(l=>{
-html += '<div class="card"><b>'+l.titulo+'</b><br>R$ '+l.preco+'</div>';
-});
-document.getElementById('lista').innerHTML = html;
+async function salvar(){
+  const titulo = document.getElementById('titulo').value;
+  const preco = document.getElementById('preco').value;
+  if(!titulo || !preco){alert('Preenche tudo!'); return;}
+  const {error} = await supabaseClient.from('livros').insert([{titulo, preco}]);
+  if(error){alert(error.message);} else {
+    document.getElementById('titulo').value='';
+    document.getElementById('preco').value='';
+    carregar();
+  }
 }
+async function excluir(id){
+  await supabaseClient.from('livros').delete().eq('id', id);
+  carregar();
+}
+carregar();
 </script>
 </body>
-                  </html>
+</html>
